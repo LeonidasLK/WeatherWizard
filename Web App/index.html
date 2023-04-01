@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weather Wizard:Register</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/9.19.1/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/9.19.1/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/9.19.1/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/9.19.1/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/9.19.1/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/9.19.1/firebase-messaging-compat.js"></script>
+    <script defer src="/__/firebase/9.19.1/firebase-storage-compat.js"></script>
+    <script defer src="/__/firebase/9.19.1/firebase-analytics-compat.js"></script>
+    <script defer src="/__/firebase/9.19.1/firebase-remote-config-compat.js"></script>
+    <script defer src="/__/firebase/9.19.1/firebase-performance-compat.js"></script>
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <style media="screen">
+      body{
+            font-family: 'Proxima Nova', sans-serif;
+            background-color:#353e92;
+            color:white;
+            text-align: center;}
+            p{font-size:20px;}
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+      body{text-align:center;
+      }
+      .google{
+  background-color: #4285F4;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.25);
+}
+#registration-form-container {
+  display: none;
+}
+#register-button {
+  display: inline-block;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+#register-button:hover {
+  background-color: #3e8e41;
+  cursor: pointer;
+}
+
+p{
+  font-size:14px;
+}
+.google:hover {
+  background-color: #DB4437;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+}
+    </style>
+  </head>
+  <body>
+    <img src="https://firebasestorage.googleapis.com/v0/b/weatherwizard-2548d.appspot.com/o/logo.png?alt=media&token=116c97ec-4af7-41a5-9fec-212784444555">
+    <h2>Κάντε εγγραφή μέσω email η google</h2>
+    
+    <button id="register-button" onclick="showRegistrationForm()">Εγγραφή με email</button>
+
+    <div id="registration-form-container">
+      <form id="register-form">
+        <label for="name">&nbsp&nbsp&nbsp&nbsp&nbsp&nbspΌνομα:</label>
+        <input type="text" id="name" name="name"><br>
+    
+        <label for="email">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspEmail:</label>
+        <input type="email" id="email" name="email"><br>
+    
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br>
+    
+        <button type="submit">Εγγραφή</button>
+      </form>
+    </div>
+    <script>
+    function showRegistrationForm() {
+      var formContainer = document.getElementById("registration-form-container");
+      formContainer.style.display = "block";
+    }
+  </script>
+  <br>
+
+    <script>
+      const registerForm = document.querySelector('#register-form');
+    
+      registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+    
+        const name = registerForm['name'].value;
+        const email = registerForm['email'].value;
+        const password = registerForm['password'].value;
+    
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            // Update the user's display name with the name they provided
+            userCredential.user.updateProfile({
+              displayName: name
+            });
+    
+            // Redirect the user to another page after successful registration
+            window.location.href = "/login.html";
+          })
+          .catch((error) => {
+            console.error('Error registering user:', error);
+          });
+      });
+    </script>
+
+
+    <button id="google-signin-btn" class="google">
+      <img src="https://img.icons8.com/color/16/000000/google-logo.png" style="vertical-align: middle; margin-right: 10px;">Εγγραφή με google
+  </button>
+  
+  <script>
+  
+  const googleSignInBtn = document.querySelector('#google-signin-btn');
+  
+  googleSignInBtn.addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+  
+    firebase.auth().signInWithPopup(provider)
+      .then((result) => {
+        // User signed in successfully
+        const user = result.user;
+        window.location.href = "/home.html";
+        console.log(user);
+      })
+      .catch((error) => {
+        // Error occurred
+        console.log(error);
+      });
+  });
+</script>
+  </body>
+</html>

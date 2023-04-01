@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html lang="el">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Weather Wizard</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <link href="https://fonts.cdnfonts.com/css/proxima-nova-2" rel="stylesheet">
+        <style> body{
+            font-family: 'Proxima Nova', sans-serif;
+            background-color:#353e92;
+            color:white;
+            text-align: center;}
+            p{font-size:20px;}
+            .search-container {
+  display: flex;
+  justify-content: center;
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.search-input {
+  width: 400px;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.search-btn {
+  background-color: #0085FF;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.search-btn:hover {
+  background-color: #0074D9;
+}
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+.forecast-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
+  display: inline-block;
+  text-align: center;
+}
+            </style>
+    </head>
+
+    <body>
+        <img src="https://firebasestorage.googleapis.com/v0/b/weatherwizard-2548d.appspot.com/o/logo.png?alt=media&token=116c97ec-4af7-41a5-9fec-212784444555" width="350" height="350">
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        
+        <script src="" async defer></script>
+
+        <br> <br>
+        <h2> Αναζήτηση βάση τοποθεσίας</h2>
+
+        <div class="search-container">
+            <input type="text" placeholder="Βάλτε μια τοποθεσία" class="search-input" id="location-input" list="suggestions">
+            <datalist id="suggestions"></datalist>
+            
+        </div>
+
+          
+         <br> 
+         
+         <button class="search-btn" id="get-weather-btn">Δείτε τι καιρό έχει σήμερα</button> 
+         
+         <br> 
+         <br>
+
+         <button class="search-btn" id="five-days-btn">Δείτε τι καιρό θα έχει τις επόμενες 5 ημέρες</button>
+
+         <br> 
+         <br>
+
+         <button id="clear-btn" class="search-btn">Καθαρισμός</button>
+
+         <script>
+         const clearBtn = document.getElementById("clear-btn");
+          clearBtn.addEventListener("click", clearWeatherInfo);
+          function clearWeatherInfo() {
+            weatherInfo.innerHTML = "";
+            forecastList.innerHTML = "";
+          }</script>
+
+
+          <div id="weather-info"></div>
+          <div id="forecast-container">
+          <ul id="forecast-list"></ul>
+        </div>
+
+          <script>
+            const apiKey = '6870f6ff8e8d6ff3afb763820588f046';
+            const locationInput = document.getElementById('location-input');
+            const getWeatherBtn = document.getElementById('get-weather-btn');
+            const fiveDaysBtn = document.getElementById("five-days-btn");
+            const weatherInfo = document.getElementById('weather-info');
+            const forecastList = document.getElementById("forecast-list");
+
+            const suggestionsList = document.getElementById('suggestions');
+
+locationInput.addEventListener('input', (event) => {
+  const query = event.target.value.trim().toLowerCase();
+
+  if (query.length < 2) {
+    // Clear suggestions if query is less than 2 characters
+    suggestionsList.innerHTML = '';
+    return;
+  }
+
+  // Fetch city suggestions from API and populate datalist
+  fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${apiKey}`)
+    .then(response => response.json())
+    .then(data => {
+      const suggestionsHTML = data.map(city => `<option value="${city.name}, ${city.country}"></option>`).join('');
+      suggestionsList.innerHTML = suggestionsHTML;
+    })
+    .catch(error => {
+      console.error('Error fetching city suggestions:', error);
+    });
+});
+            
+            // Days of the week array
+            const daysOfWeek = ['Κυριακή', 'Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο'];
+            
+            // Get weather for 1 day
+            getWeatherBtn.addEventListener('click', () => {
+              const location = locationInput.value;
+              if (!location) return;
+            
+              fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric&lang=el`)
+                .then(response => response.json())
+                .then(data => {
+                  const { name, main: { temp, humidity }, weather: [{ description, icon }] } = data;
+                  const weatherHTML = `
+                    <h2>${name}</h2>
+                    <img src="https://openweathermap.org/img/wn/${icon}.png" alt="${description}">
+                    <p>${description}</p>
+                    <p>Temperature: ${temp} &#8451;</p>
+                    <p>Humidity: ${humidity}%</p>
+                  `;
+                  weatherInfo.innerHTML = weatherHTML;
+                })
+                .catch(error => {
+                  console.error('Error fetching weather:', error);
+                  weatherInfo.innerHTML = '<p>Sorry, something went wrong. Please try again later.</p>';
+                });
+            });
+            
+            // Get weather for 5 days
+            fiveDaysBtn.addEventListener("click", () => {
+              const location = locationInput.value;
+              if (!location) return;
+            
+              const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&units=metric&appid=${apiKey}&lang=el`;
+            
+              fetch(apiUrl)
+                .then((response) => {
+                  if (response.ok) {
+                    return response.json();
+                  } else {
+                    throw new Error("Network response was not ok.");
+                  }
+                })
+                .then((data) => {
+                  forecastList.innerHTML = "";
+            
+                  for (let i = 0; i < 5; i++) {
+                    const date = new Date(data.list[i * 8].dt * 1000);
+                    const dayOfWeek = daysOfWeek[date.getDay()];
+                    const iconUrl = `https://openweathermap.org/img/w/${data.list[i * 8].weather[0].icon}.png`;
+                    const temp = data.list[i * 8].main.temp.toFixed(1);
+                    const desc = data.list[i * 8].weather[0].description;
+            
+                    const forecastItem = `
+  <li class="forecast-item">
+    <span>${dayOfWeek}</span>
+    <img src="${iconUrl}" alt="${data.list[i * 8].weather[0].description}">
+    <span>${temp}&deg;C</span>
+    <p>${data.list[i * 8].weather[0].description}</p>
+  </li>
+`;
+
+  forecastList.insertAdjacentHTML("beforeend", forecastItem);
+}
+                })
+                .catch((error) => {
+                  console.error("Error fetching weather data:", error);
+                });
+            });
+            
+            // Trigger search when enter key is pressed
+            input.addEventListener('keyup', function(event) {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                getWeatherBtn.click();
+              }
+            });
+            
+            </script>
+            
+
+
+    </body>
+    
+</html>
