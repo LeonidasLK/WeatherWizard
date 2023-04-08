@@ -21,7 +21,7 @@
           to avoid connecting the SDK to running emulators.
         -->
         <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-        <style media="screen">
+        <style media="all">
             body{
                   font-family: 'Proxima Nova', sans-serif;
                   background-color:#353e92;
@@ -36,6 +36,25 @@
   padding: 10px 20px;
   font-size: 16px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.25);
+}
+
+      img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media only screen and (max-width: 600px) {
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@media only screen and (min-width: 601px) {
+  img {
+    max-width: 600px;
+    height: auto;
+  }
 }
 
 .google:hover {
@@ -84,28 +103,32 @@
     </script>
 
 <button id="google-signin-btn" class="google">
-    <img src="https://img.icons8.com/color/16/000000/google-logo.png" style="vertical-align: middle; margin-right: 10px;">Σύνδεση με google
+  <img src="https://img.icons8.com/color/16/000000/google-logo.png" style="vertical-align: middle; margin-right: 10px;">Σύνδεση με Google
 </button>
 
 <script>
+  const googleSignInBtn = document.querySelector('#google-signin-btn');
 
-const googleSignInBtn = document.querySelector('#google-signin-btn');
+  googleSignInBtn.addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
 
-googleSignInBtn.addEventListener('click', () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+      .then((result) => {
+        // User signed in successfully
+        const user = result.user;
+        window.location.href = "/home.html";
+        console.log(user);
+      })
+      .catch((error) => {
+        // Error occurred
+        console.log(error);
+      });
+  });
 
-  firebase.auth().signInWithPopup(provider)
-    .then((result) => {
-      // User signed in successfully
-      const user = result.user;
-      window.location.href = "/home.html";
-      console.log(user);
-    })
-    .catch((error) => {
-      // Error occurred
-      console.log(error);
-    });
-});
+  // Call the Android interface method when the user signs in with Google
+  function onSignIn(googleUser) {
+    Android.onGoogleSignIn();
+  }
 </script>
   </body>
 </html>
